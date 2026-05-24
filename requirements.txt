@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+langchain
+langchain-google-genai
+langchain-community
+langgraph
+chromadb
+sentence-transformers
+python-dotenv
+joblib
+torch
+numpy
+pandas
+scikit-learn
+pydantic

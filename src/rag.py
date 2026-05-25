@@ -10,6 +10,8 @@ load_dotenv()
 DOCUMENTS_PATH = "data/documents"
 VECTOR_STORE_PATH = "data/vector_store"
 
+_vector_store = None
+
 
 def load_documents():
     loader = DirectoryLoader(
@@ -50,21 +52,23 @@ def load_vector_store():
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
-
-    vector_store = Chroma(
+    return Chroma(
         persist_directory=VECTOR_STORE_PATH,
         embedding_function=embeddings
     )
-    return vector_store
 
 
 def get_vector_store():
+    global _vector_store
+    if _vector_store is not None:
+        return _vector_store
     if os.path.exists(VECTOR_STORE_PATH) and os.listdir(VECTOR_STORE_PATH):
         print("Loading existing vector store...")
-        return load_vector_store()
+        _vector_store = load_vector_store()
     else:
         print("Building new vector store...")
-        return build_vector_store()
+        _vector_store = build_vector_store()
+    return _vector_store
 
 
 def retrieve(query: str) -> str:

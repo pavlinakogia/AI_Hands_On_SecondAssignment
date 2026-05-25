@@ -3,21 +3,25 @@ import json
 import joblib
 import numpy as np
 import pandas as pd
-import torch
+import torch  # noqa: F401 - required for pickle to load NNWrapper
 from langchain.tools import tool
 from src.rag import retrieve
-from src.train_neural import NeuralNet, NNWrapper
+from src.train_neural import NeuralNet, NNWrapper  # noqa: F401 - required for joblib
 from dotenv import load_dotenv
 
 load_dotenv()
 
+_model = None
+_scaler = None
+
 
 def load_model():
-    import sys
-    sys.path.insert(0, '.')
-    model = joblib.load('models/best_model.pkl')
-    scaler = joblib.load('models/scaler.pkl')
-    return model, scaler
+    global _model, _scaler
+    if _model is not None and _scaler is not None:
+        return _model, _scaler
+    _model = joblib.load('models/best_model.pkl')
+    _scaler = joblib.load('models/scaler.pkl')
+    return _model, _scaler
 
 
 @tool
@@ -74,8 +78,6 @@ def prediction_tool(input_json: str) -> str:
 
 
 @tool
-
-
 def dataset_stats_tool(column: str) -> str:
     """Use this tool to get summary statistics about the weather dataset
     used to train the prediction model. Input is a column name as a string.

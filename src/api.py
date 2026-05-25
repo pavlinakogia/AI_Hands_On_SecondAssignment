@@ -1,14 +1,11 @@
-import os
 from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage, AIMessage
 from src.agent import run_agent, get_agent as get_agent_instance
-from fastapi.responses import StreamingResponse
-import asyncio
 
 app = FastAPI(title="Weather Prediction Agent")
 
-# Αποθηκεύουμε το history ανά session
 session_store: dict = {}
 
 
@@ -25,18 +22,12 @@ class ChatResponse(BaseModel):
 def chat(request: ChatRequest):
     session_id = request.session_id
 
-    # Παίρνουμε το history για αυτό το session
     if session_id not in session_store:
         session_store[session_id] = []
 
     history = session_store[session_id]
-
-    # Τρέχουμε τον agent
-    response = run_agent(request.message, history)
-
-    # Ενημερώνουμε το history
     history.append(HumanMessage(content=request.message))
-    history.append(AIMessage(content=response))
+    response = run_agent(request.message, history)
 
     return ChatResponse(response=response)
 
@@ -66,6 +57,11 @@ async def stream_agent_response(message: str, history: list):
                     yield f"data: {content}\n\n"
 
     yield "data: [DONE]\n\n"
+
+    # Ενημέρωση history μετά το streaming
+    full_text = " ".join(full_response)
+    history.append(HumanMessage(content=message))
+    history.append(AIMessage(content=full_text))
 
 
 @app.post("/chat/stream")

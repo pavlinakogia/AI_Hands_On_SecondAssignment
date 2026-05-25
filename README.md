@@ -153,6 +153,11 @@ of rain at 17.7%.
 
 ## 6. Installation & Execution
 
+> **Note on embeddings:** This project uses `sentence-transformers/all-MiniLM-L6-v2` 
+> for document embeddings. This is a lightweight embedding model that runs locally — 
+> it is not an LLM and does not require an API key. The LLM used for the agent 
+> is Google Gemini (cloud API).
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/pavlinakogia/AI_Hands_On_SecondAssignment

@@ -1,12 +1,4 @@
 .env
+.idea/
 __pycache__/
 *.pyc
-data/vector_store/
-models/*.pkl
-models/*.pt
-.idea/
-*.pkl
-*.pt
-__pycache__/
-.env
-data/vector_store/
